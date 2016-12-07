@@ -1,0 +1,25 @@
+body {
+  background-color: #f0f0f0;
+/*  position: static;
+  padding: 5px;
+  margin: 0px;*/
+}
+
+canvas{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+#canvas0{ z-index: 0; }
+#canvas1{ z-index: 1; }
+
+
+#view{
+  position: relative;
+
+  border: 1px solid #0f0f0f;
+
+  width: 500px;
+  height: 500px;
+}
