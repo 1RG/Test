@@ -1,6 +1,6 @@
-var c0 = document.getElementById("canvas0");
+var c0 = _id("canvas0");
 var c0tx = c0.getContext("2d");
-var c1 = document.getElementById("canvas1");
+var c1 = _id("canvas1");
 var c1tx = c1.getContext("2d");
 
 var mainCursor = null;
@@ -25,9 +25,9 @@ var arr = [
 ];
 
 testMoving(c0tx);
-//fillPart(c0tx, arr, "Full");
-//fillPart(c0tx, arr, "Circle");
-//fillPart(c0tx, arr, "No");
+//fillPart(c0tx, arr, "full", "#38475c", 3);
+//fillPart(c0tx, arr, "circle", "#38475c", 3);
+//fillPart(c0tx, arr, "no", "#38475c", 3);
 
 var nr = 0;
 for (var i = 0; i < arr.length; i++) {
@@ -39,64 +39,91 @@ for (var i = 0; i < arr.length; i++) {
 //    console.log("=== ", i, (nr-len));
 }
 console.log("all nr ",nr);
+initEvent();
 
-c1.addEventListener('mousedown', function(evt) {
-  if(evt.button == 0){
-    drawCursor(c0tx, mainCursor.x, mainCursor.y, "#00ff00");
-    eMousedown = true;
-    eMDCursor = mainCursor;
-    eMDCursorArrNr = mainCursorArrNr;
-  }
-}, false);
+// ###
 
-c1.addEventListener('mouseup', function(evt) {
-  if(evt.button == 0){
-    drawCursor(c0tx, mainCursor.x, mainCursor.y, "#0000ff");
-    if(mainCursorArrNr != eMDCursorArrNr && eMousedown){
-      drawLine(c0tx, mainCursor,"#abcabc");
-
-      addNewLine();
-
-      var delPartArr = deleteMinPart();
-      console.log(delPartArr);
-      fillPart(c0tx, delPartArr, "Full");
-
-  //    c0tx.clearRect(0, 0, c1.width, c1.height);
-      testMoving2(c0tx, delPartArr);
-      testMoving(c0tx);
+function initEvent(){
+  c1.addEventListener('mousedown', function(evt) {
+    if(evt.button == 0){
+      drawCursor(c0tx, mainCursor.x, mainCursor.y, "#00ff00");
+      eMousedown = true;
+      eMDCursor = mainCursor;
+      eMDCursorArrNr = mainCursorArrNr;
     }
-    eMousedown = false;
-  }
-}, false);
+  }, false);
 
-c1.addEventListener('mousemove', function(evt) {
-  var rect = c1.getBoundingClientRect();
-  var mx = evt.clientX - rect.left;
-  var my = evt.clientY - rect.top;
+  c1.addEventListener('mouseup', function(evt) {
+    if(evt.button == 0){
+      drawCursor(c0tx, mainCursor.x, mainCursor.y, "#0000ff");
+      if(mainCursorArrNr != eMDCursorArrNr && eMousedown){
+        drawLine(c0tx, mainCursor,"#abcabc");
 
-  c1tx.clearRect(0, 0, c1.width, c1.height);
+        addNewLine();
 
-  var m = getDistance(mx, my, arr[0]);
-  var mo = arr[0];
-  var mi = 0;
-  for (var i = 0; i < arr.length; i++) {
-    pointsCoordinatesCross(arr, i, function(e){
-      var t = getDistance(mx, my, e);
-      if(t < m){
-        m = t;
-        mo = e;
-        mi = i;
+        var delPartArr = deleteMinPart();
+        console.log(delPartArr);
+
+        var mainAnimType = _id("drow_anim_type").value;
+        var mainColor = _id("drow_anim_color").value;
+        var mainWidth = _id("drow_line_width").value;
+
+        fillPart(c0tx, delPartArr, mainAnimType, mainColor, mainWidth);
+
+        // c0tx.clearRect(0, 0, c1.width, c1.height);
+        // testMoving2(c0tx, delPartArr);
+        testMoving(c0tx);
       }
-    });
-  }
-  mainCursor = mo;
-  mainCursorArrNr = mi+1;
-  drawCursor(c1tx, mo.x, mo.y);
-  if(eMousedown){
-    drawLine(c1tx, mainCursor, "#ffff00");
-  }
-  //console.log(mainCursorArrNr, mo);
-}, false);
+      eMousedown = false;
+    }
+  }, false);
+
+  c1.addEventListener('mousemove', function(evt) {
+    if(arr.length != 0){
+      var rect = c1.getBoundingClientRect();
+      var mx = evt.clientX - rect.left;
+      var my = evt.clientY - rect.top;
+
+      c1tx.clearRect(0, 0, c1.width, c1.height);
+
+      var m = getDistance(mx, my, arr[0]);
+      var mo = arr[0];
+      var mi = 0;
+      for (var i = 0; i < arr.length; i++) {
+        pointsCoordinatesCross(arr, i, function(e){
+          var t = getDistance(mx, my, e);
+          if(t < m){
+            m = t;
+            mo = e;
+            mi = i;
+          }
+        });
+      }
+      mainCursor = mo;
+      mainCursorArrNr = mi+1;
+      drawCursor(c1tx, mo.x, mo.y);
+      if(eMousedown){
+        drawLine(c1tx, mainCursor, "#ffff00");
+      }
+    }
+    //console.log(mainCursorArrNr, mo);
+  }, false);
+
+  _id("btn_end").addEventListener('click', function(evt){
+    var mainAnimType = _id("drow_anim_type").value;
+    var mainColor = _id("drow_anim_color").value;
+    var mainWidth = _id("drow_line_width").value;
+
+    fillPart(c0tx, arr, mainAnimType, mainColor, mainWidth);
+
+    arr = [];
+    c1tx.clearRect(0, 0, c1.width, c1.height);
+  });
+}
+
+function _id(id){
+  return document.getElementById(id);
+}
 
 function drawCursor(ctx, x, y, rgb = '#ff0000') {
   var a = 30;
@@ -317,14 +344,14 @@ function deleteMinPart(){
   return delArr;
 }
 
-function fillPart(ctx, a, animation) {
+function fillPart(ctx, a, animation, color, width) {
   var draw = function(e0, e1){
     ctx.beginPath();
     ctx.moveTo( e0.x, e0.y );
     ctx.lineTo( e1.x, e1.y );
     ctx.closePath();
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#bb6699";
+    ctx.lineWidth = width;
+    ctx.strokeStyle = color;
     ctx.stroke();
   }
 
@@ -363,7 +390,7 @@ function fillPart(ctx, a, animation) {
       draw(tempA1[tempA1.length-1], tempA1[0]);
       testLoopEnd(tempA1[tempA1.length-1], tempA1[0], true);
     } catch (e) {
-      console.log("FUCK");
+      console.log("F");
       endloop = true;
     }
     tempA0 = tempA1;
@@ -390,7 +417,7 @@ function fillPart(ctx, a, animation) {
   }
 
   switch (animation) {
-    case "Full":
+    case "full":
       var i = 0;
       var interval = setInterval(function(){
         if(i < tempA0.length){
@@ -403,7 +430,7 @@ function fillPart(ctx, a, animation) {
         }
       }, anTimeDelay);
     break;
-    case "Circle":
+    case "circle":
       var interval = setInterval(function(){
         for (var i = 0; i < tempA0.length; i++) {
           drawLP1(i);
@@ -412,7 +439,7 @@ function fillPart(ctx, a, animation) {
         if(endloop){ clearInterval(interval) }
       }, anTimeDelay);
     break;
-    case "No":
+    case "no":
       var loop = true;
       while(loop) {
         for (var i = 0; i < tempA0.length; i++) {

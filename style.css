@@ -11,9 +11,12 @@ canvas{
   top: 0px;
 }
 
+#tool button, select, input{
+  margin: 5px;
+}
+
 #canvas0{ z-index: 0; }
 #canvas1{ z-index: 1; }
-
 
 #view{
   position: relative;
@@ -22,4 +25,13 @@ canvas{
 
   width: 500px;
   height: 500px;
+
+  float: left;
+}
+
+#tool{
+  width: 90px;
+  float: left;
+  height: 290px;
+  margin: 5px
 }
