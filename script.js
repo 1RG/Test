@@ -25,9 +25,9 @@ var arr = [
 ];
 
 testMoving(c0tx);
-//fillPart(c0tx, arr, "full", "#38475c", 3);
-//fillPart(c0tx, arr, "circle", "#38475c", 3);
-//fillPart(c0tx, arr, "no", "#38475c", 3);
+//fillPart(c0tx, arr, {color: "full"});
+//fillPart(c0tx, arr, {color: "circle"});
+//fillPart(c0tx, arr, {color: "no"});
 
 var nr = 0;
 for (var i = 0; i < arr.length; i++) {
@@ -64,11 +64,15 @@ function initEvent(){
         var delPartArr = deleteMinPart();
         console.log(delPartArr);
 
-        var mainAnimType = _id("drow_anim_type").value;
-        var mainColor = _id("drow_anim_color").value;
-        var mainWidth = _id("drow_line_width").value;
+        var mainParameters = {
+          animation: _id("drow_anim_type").value,
+          color: _id("drow_anim_color").value,
+          width: _id("drow_line_width").value,
+          density: _id("drow_line_density").value,
+          delay: _id("drow_anim_delay").value
+        };
 
-        fillPart(c0tx, delPartArr, mainAnimType, mainColor, mainWidth);
+        fillPart(c0tx, delPartArr, mainParameters);
 
         // c0tx.clearRect(0, 0, c1.width, c1.height);
         // testMoving2(c0tx, delPartArr);
@@ -110,11 +114,16 @@ function initEvent(){
   }, false);
 
   _id("btn_end").addEventListener('click', function(evt){
-    var mainAnimType = _id("drow_anim_type").value;
-    var mainColor = _id("drow_anim_color").value;
-    var mainWidth = _id("drow_line_width").value;
 
-    fillPart(c0tx, arr, mainAnimType, mainColor, mainWidth);
+    var mainParameters = {
+      animation: _id("drow_anim_type").value,
+      color: _id("drow_anim_color").value,
+      width: _id("drow_line_width").value,
+      density: _id("drow_line_density").value,
+      delay: _id("drow_anim_delay").value
+    };
+
+    fillPart(c0tx, arr, mainParameters);
 
     arr = [];
     c1tx.clearRect(0, 0, c1.width, c1.height);
@@ -344,19 +353,31 @@ function deleteMinPart(){
   return delArr;
 }
 
-function fillPart(ctx, a, animation, color, width) {
+function fillPart(ctx, a, parameter) {
+  var parObj = {
+    animation: "full",
+    color: "#38475c",
+    width: 3,
+    density: 10,
+    delay: 60
+  };
+
+  for (var pov in parObj) {
+    if(parameter.hasOwnProperty( pov )){
+        parObj[pov] = parameter[pov];
+    }
+  }
+
   var draw = function(e0, e1){
     ctx.beginPath();
     ctx.moveTo( e0.x, e0.y );
     ctx.lineTo( e1.x, e1.y );
     ctx.closePath();
-    ctx.lineWidth = width;
-    ctx.strokeStyle = color;
+    ctx.lineWidth = parObj.width;
+    ctx.strokeStyle = parObj.color;
     ctx.stroke();
   }
 
-  var dis = 10;
-  var anTimeDelay = 60;
   var maxPrevPerimCoun = 10;
 
   var nr = 0;
@@ -373,7 +394,7 @@ function fillPart(ctx, a, animation, color, width) {
     nr = 0;
     pointsCoordinatesCross(tempA0, i, function(p1){
       nr++;
-      if((nr%dis) == 0){
+      if((nr % parObj.density) == 0){
         var p0 = temp;
         if(i != 0){
           draw(p0, p1);
@@ -382,7 +403,7 @@ function fillPart(ctx, a, animation, color, width) {
         temp = p1;
         tempA1.push(p1);
       }
-    }, dis);
+    }, parObj.density);
   }
   function drawLP2(){
     // #1/3 Klaidos gaudimas
@@ -416,7 +437,7 @@ function fillPart(ctx, a, animation, color, width) {
     }
   }
 
-  switch (animation) {
+  switch (parObj.animation) {
     case "full":
       var i = 0;
       var interval = setInterval(function(){
@@ -428,7 +449,7 @@ function fillPart(ctx, a, animation, color, width) {
           drawLP2();
           if(endloop){ clearInterval(interval) }
         }
-      }, anTimeDelay);
+      }, parObj.delay);
     break;
     case "circle":
       var interval = setInterval(function(){
@@ -437,7 +458,7 @@ function fillPart(ctx, a, animation, color, width) {
         }
         drawLP2();
         if(endloop){ clearInterval(interval) }
-      }, anTimeDelay);
+      }, parObj.delay);
     break;
     case "no":
       var loop = true;
