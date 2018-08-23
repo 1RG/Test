@@ -44,16 +44,17 @@ initEvent();
 // ###
 
 function initEvent(){
-  c1.addEventListener('mousedown', function(evt) {
+  var onDown = function(evt) {
+    console.log(evt.button);
     if(evt.button == 0){
       drawCursor(c0tx, mainCursor.x, mainCursor.y, "#00ff00");
       eMousedown = true;
       eMDCursor = mainCursor;
       eMDCursorArrNr = mainCursorArrNr;
     }
-  }, false);
+  };
 
-  c1.addEventListener('mouseup', function(evt) {
+  var onUp = function(evt) {
     if(evt.button == 0){
       drawCursor(c0tx, mainCursor.x, mainCursor.y, "#0000ff");
       if(mainCursorArrNr != eMDCursorArrNr && eMousedown){
@@ -80,9 +81,9 @@ function initEvent(){
       }
       eMousedown = false;
     }
-  }, false);
+  };
 
-  c1.addEventListener('mousemove', function(evt) {
+  var onMove = function(evt) {
     if(arr.length != 0){
       var rect = c1.getBoundingClientRect();
       var mx = evt.clientX - rect.left;
@@ -111,6 +112,31 @@ function initEvent(){
       }
     }
     //console.log(mainCursorArrNr, mo);
+  };
+
+  c1.addEventListener('mousedown', onDown, false);
+  c1.addEventListener('mouseup', onUp, false);
+  c1.addEventListener('mousemove', onMove, false);
+
+  var firstTouch = function(evt, event_function_arr){
+    var touches = evt.changedTouches;
+    if(touches.length > 0){
+      touches[0].button = 0;
+
+      for (var event_function of event_function_arr) {
+        event_function(touches[0]);
+      }
+    }
+  }
+
+  c1.addEventListener('touchstart', function(evt) {
+    firstTouch(evt, [onMove, onDown]);
+  }, false);
+  c1.addEventListener('touchend', function(evt) {
+    firstTouch(evt, [onUp]);
+  }, false);
+  c1.addEventListener('touchmove', function(evt) {
+    firstTouch(evt, [onMove]);
   }, false);
 
   _id("btn_end").addEventListener('click', function(evt){
