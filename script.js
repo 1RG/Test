@@ -1,45 +1,58 @@
-var c0 = _id("canvas0");
-var c0tx = c0.getContext("2d");
-var c1 = _id("canvas1");
-var c1tx = c1.getContext("2d");
+var c0, c1;
+var c0tx, c1tx;
 
-var mainCursor = null;
-var mainCursorArrNr = null;
+var arr;
+
+var mainCursor,  mainCursorArrNr, eMDCursor, eMDCursorArrNr = null;
 var eMousedown = false;
-var eMDCursor = null;
-var eMDCursorArrNr = null;
 
 var Axis = function(x, y) {
   this.x = x;
   this.y = y;
 }
 
-var arr = [
-  new Axis(50, 34),
-  new Axis(250, 14),
-  new Axis(490, 70),
-//  new Axis(370, 250),
-  new Axis(363, 310),
-  new Axis(251, 423),
-  new Axis(55, 423),
-];
+window.onload = function(){
+  c0 = _id("canvas0");
+  c0tx = c0.getContext("2d");
+  c1 = _id("canvas1");
+  c1tx = c1.getContext("2d");
 
-testMoving(c0tx);
-//fillPart(c0tx, arr, {color: "full"});
-//fillPart(c0tx, arr, {color: "circle"});
-//fillPart(c0tx, arr, {color: "no"});
+  if(DEV){
+    arr = [
+      new Axis(50, 34),
+      new Axis(250, 14),
+      new Axis(490, 70),
+      new Axis(363, 310),
+      new Axis(251, 423),
+      new Axis(55, 423)
+    ];
 
-var nr = 0;
-for (var i = 0; i < arr.length; i++) {
-    var len = nr;
-    pointsCoordinatesCross(arr, i, function(e){
-      nr++;
-//      console.log(nr, e, i);
-    });
-//    console.log("=== ", i, (nr-len));
-}
-console.log("all nr ",nr);
-initEvent();
+    testMoving(c0tx);
+    //fillPart(c0tx, arr, {color: "full"});
+    //fillPart(c0tx, arr, {color: "circle"});
+    //fillPart(c0tx, arr, {color: "no"});
+  }else{
+    arr = [
+      new Axis(0, 0),
+      new Axis(c0.width, 0),
+      new Axis(c0.width, c0.height),
+      new Axis(0 , c0.height)
+    ];
+  }
+
+  var nr = 0;
+  for (var i = 0; i < arr.length; i++) {
+      var len = nr;
+      pointsCoordinatesCross(arr, i, function(e){
+        nr++;
+  //      console.log(nr, e, i);
+      });
+  //    console.log("=== ", i, (nr-len));
+  }
+
+  console.log("all nr ",nr);
+  initEvent();
+};
 
 // ###
 
@@ -47,7 +60,7 @@ function initEvent(){
   var onDown = function(evt) {
     console.log(evt.button);
     if(evt.button == 0){
-      drawCursor(c0tx, mainCursor.x, mainCursor.y, "#00ff00");
+      if(DEV){ drawCursor(c0tx, mainCursor.x, mainCursor.y, "#00ff00"); }
       eMousedown = true;
       eMDCursor = mainCursor;
       eMDCursorArrNr = mainCursorArrNr;
@@ -56,15 +69,8 @@ function initEvent(){
 
   var onUp = function(evt) {
     if(evt.button == 0){
-      drawCursor(c0tx, mainCursor.x, mainCursor.y, "#0000ff");
+      if(DEV){ drawCursor(c0tx, mainCursor.x, mainCursor.y, "#0000ff"); }
       if(mainCursorArrNr != eMDCursorArrNr && eMousedown){
-        drawLine(c0tx, mainCursor,"#abcabc");
-
-        addNewLine();
-
-        var delPartArr = deleteMinPart();
-        console.log(delPartArr);
-
         var mainParameters = {
           animation: _id("drow_anim_type").value,
           color: _id("drow_anim_color").value,
@@ -73,11 +79,21 @@ function initEvent(){
           delay: _id("drow_anim_delay").value
         };
 
+        drawLine(c0tx, mainCursor, mainParameters.color, mainParameters.width);
+
+        addNewLine();
+
+        var delPartArr = deleteMinPart();
+        console.log(delPartArr);
+
         fillPart(c0tx, delPartArr, mainParameters);
 
         // c0tx.clearRect(0, 0, c1.width, c1.height);
         // testMoving2(c0tx, delPartArr);
-        testMoving(c0tx);
+
+        if(DEV){
+          testMoving(c0tx);
+        }
       }
       eMousedown = false;
     }
@@ -190,7 +206,10 @@ function testMoving(ctx) {
   ctx.lineWidth = 3;
   ctx.strokeStyle = '#000000';
   ctx.stroke();
-  testDot(ctx)
+
+  if(DEV){
+    testDot(ctx);
+  }
 }
 
 function testMoving2(ctx, a) {
@@ -202,7 +221,10 @@ function testMoving2(ctx, a) {
   ctx.lineWidth = 3;
   ctx.strokeStyle = '#ff0000';
   ctx.stroke();
-  testDot(ctx)
+
+  if(DEV){
+    testDot(ctx)
+  }
 }
 
 function testDot(ctx) {
@@ -284,13 +306,13 @@ function pointsCoordinatesCross(arrA, n, method, bre = 0) {
   }
 }
 
-function drawLine(ctx, endAxis, rgb = '#000000'){
+function drawLine(ctx, endAxis, rgb = '#000000', width = 3){
   if(eMDCursor != null){
     ctx.beginPath();
     ctx.moveTo( eMDCursor.x, eMDCursor.y );
     ctx.lineTo( endAxis.x, endAxis.y );
     ctx.closePath();
-    ctx.lineWidth = 3;
+    ctx.lineWidth = width;
     ctx.strokeStyle = rgb;
     ctx.stroke();
   }
