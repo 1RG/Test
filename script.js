@@ -1,4 +1,4 @@
-var c0, c1;
+﻿var c0, c1;
 var c0tx, c1tx;
 
 var arr;
@@ -520,3 +520,4 @@ function fillPart(ctx, a, parameter) {
     break;
   }
 }
+ 
