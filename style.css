@@ -30,8 +30,13 @@ canvas{
 }
 
 #tool{
-  width: 90px;
+  width: 190px;
   float: left;
-  height: 290px;
+  height: 390px;
   margin: 5px
+}
+
+#tool span, button, select, option{
+  font-family: "Calibri";
+  display: block;
 }

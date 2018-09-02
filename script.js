@@ -6,6 +6,8 @@ var arr;
 var mainCursor,  mainCursorArrNr, eMDCursor, eMDCursorArrNr = null;
 var eMousedown = false;
 
+var stopAmin = false;
+
 var Axis = function(x, y) {
   this.x = x;
   this.y = y;
@@ -17,28 +19,7 @@ window.onload = function(){
   c1 = _id("canvas1");
   c1tx = c1.getContext("2d");
 
-  if(DEV){
-    arr = [
-      new Axis(50, 34),
-      new Axis(250, 14),
-      new Axis(490, 70),
-      new Axis(363, 310),
-      new Axis(251, 423),
-      new Axis(55, 423)
-    ];
-
-    testMoving(c0tx);
-    //fillPart(c0tx, arr, {color: "full"});
-    //fillPart(c0tx, arr, {color: "circle"});
-    //fillPart(c0tx, arr, {color: "no"});
-  }else{
-    arr = [
-      new Axis(0, 0),
-      new Axis(c0.width, 0),
-      new Axis(c0.width, c0.height),
-      new Axis(0 , c0.height)
-    ];
-  }
+  arr = getStartArr();
 
   var nr = 0;
   for (var i = 0; i < arr.length; i++) {
@@ -50,7 +31,7 @@ window.onload = function(){
   //    console.log("=== ", i, (nr-len));
   }
 
-  console.log("all nr ",nr);
+  console.log("all nr ", nr);
   initEvent();
 };
 
@@ -69,6 +50,8 @@ function initEvent(){
 
   var onUp = function(evt) {
     if(evt.button == 0){
+      if( stopAmin ){ stopAmin = false }
+
       if(DEV){ drawCursor(c0tx, mainCursor.x, mainCursor.y, "#0000ff"); }
       if(mainCursorArrNr != eMDCursorArrNr && eMousedown){
         var mainParameters = {
@@ -156,6 +139,7 @@ function initEvent(){
   }, false);
 
   _id("btn_end").addEventListener('click', function(evt){
+    if( stopAmin ){ stopAmin = false }
 
     var mainParameters = {
       animation: _id("drow_anim_type").value,
@@ -169,6 +153,14 @@ function initEvent(){
 
     arr = [];
     c1tx.clearRect(0, 0, c1.width, c1.height);
+  });
+
+  _id("btn_reset").addEventListener('click', function(evt){
+    if(confirm("Are you sure you want to clear canvas?")){
+      stopAmin = true;
+      arr = getStartArr();
+      c0tx.clearRect(0, 0, c0.width, c0.height);
+    }
   });
 }
 
@@ -489,34 +481,72 @@ function fillPart(ctx, a, parameter) {
     case "full":
       var i = 0;
       var interval = setInterval(function(){
-        if(i < tempA0.length){
-          drawLP1(i);
-          i++;
-        }else{
-          i = 0;
-          drawLP2();
-          if(endloop){ clearInterval(interval) }
+        if(stopAmin){ clearInterval(interval); } else {
+          if(i < tempA0.length){
+            drawLP1(i);
+            i++;
+          }else{
+            i = 0;
+            drawLP2();
+            if(endloop){ clearInterval(interval); }
+          }
         }
       }, parObj.delay);
     break;
     case "circle":
       var interval = setInterval(function(){
-        for (var i = 0; i < tempA0.length; i++) {
-          drawLP1(i);
+        if(stopAmin){
+          clearInterval(interval);
+        }else{
+          for (var i = 0; i < tempA0.length; i++) {
+            drawLP1(i);
+          }
+          drawLP2();
+          if(endloop){ clearInterval(interval); }
         }
-        drawLP2();
-        if(endloop){ clearInterval(interval) }
       }, parObj.delay);
     break;
     case "no":
       var loop = true;
       while(loop) {
-        for (var i = 0; i < tempA0.length; i++) {
-          drawLP1(i);
+        if(stopAmin){
+           loop = false;
+        }else{
+          for (var i = 0; i < tempA0.length; i++) {
+            drawLP1(i);
+          }
+          drawLP2();
+          if(endloop){ loop = false; }
         }
-        drawLP2();
-        if(endloop){ loop = false; }
       }
     break;
   }
+}
+
+function getStartArr(){
+  var r_arr = [];
+  if(DEV){
+    r_arr = [
+      new Axis(50, 34),
+      new Axis(250, 14),
+      new Axis(490, 70),
+      new Axis(363, 310),
+      new Axis(251, 423),
+      new Axis(55, 423)
+    ];
+
+    testMoving(c0tx);
+    //fillPart(c0tx, arr, {color: "full"});
+    //fillPart(c0tx, arr, {color: "circle"});
+    //fillPart(c0tx, arr, {color: "no"});
+  }else{
+    r_arr = [
+      new Axis(0, 0),
+      new Axis(c0.width, 0),
+      new Axis(c0.width, c0.height),
+      new Axis(0 , c0.height)
+    ];
+  }
+
+  return r_arr;
 }
