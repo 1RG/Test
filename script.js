@@ -1,4 +1,4 @@
-﻿var c0, c1;
+var c0, c1;
 var c0tx, c1tx;
 
 var arr;
@@ -6,39 +6,23 @@ var arr;
 var mainCursor,  mainCursorArrNr, eMDCursor, eMDCursorArrNr = null;
 var eMousedown = false;
 
+var stopAmin = false;
+
 var Axis = function(x, y) {
   this.x = x;
   this.y = y;
 }
 
 window.onload = function(){
+  _id("info_text").innerHTML = "JS loading";
+  initMedia();
+
   c0 = _id("canvas0");
   c0tx = c0.getContext("2d");
   c1 = _id("canvas1");
   c1tx = c1.getContext("2d");
 
-  if(DEV){
-    arr = [
-      new Axis(50, 34),
-      new Axis(250, 14),
-      new Axis(490, 70),
-      new Axis(363, 310),
-      new Axis(251, 423),
-      new Axis(55, 423)
-    ];
-
-    testMoving(c0tx);
-    //fillPart(c0tx, arr, {color: "full"});
-    //fillPart(c0tx, arr, {color: "circle"});
-    //fillPart(c0tx, arr, {color: "no"});
-  }else{
-    arr = [
-      new Axis(0, 0),
-      new Axis(c0.width, 0),
-      new Axis(c0.width, c0.height),
-      new Axis(0 , c0.height)
-    ];
-  }
+  arr = getStartArr();
 
   var nr = 0;
   for (var i = 0; i < arr.length; i++) {
@@ -50,8 +34,11 @@ window.onload = function(){
   //    console.log("=== ", i, (nr-len));
   }
 
-  console.log("all nr ",nr);
+  console.log("all nr ", nr);
+
   initEvent();
+
+  _id("info_text").innerHTML = "";
 };
 
 // ###
@@ -69,6 +56,8 @@ function initEvent(){
 
   var onUp = function(evt) {
     if(evt.button == 0){
+      if( stopAmin ){ stopAmin = false }
+
       if(DEV){ drawCursor(c0tx, mainCursor.x, mainCursor.y, "#0000ff"); }
       if(mainCursorArrNr != eMDCursorArrNr && eMousedown){
         var mainParameters = {
@@ -124,7 +113,7 @@ function initEvent(){
       mainCursorArrNr = mi+1;
       drawCursor(c1tx, mo.x, mo.y);
       if(eMousedown){
-        drawLine(c1tx, mainCursor, "#ffff00");
+        drawLine(c1tx, mainCursor, invertColor( _id("drow_anim_color").value ));
       }
     }
     //console.log(mainCursorArrNr, mo);
@@ -146,16 +135,20 @@ function initEvent(){
   }
 
   c1.addEventListener('touchstart', function(evt) {
+    evt.preventDefault();
     firstTouch(evt, [onMove, onDown]);
   }, false);
   c1.addEventListener('touchend', function(evt) {
+    evt.preventDefault();
     firstTouch(evt, [onUp]);
   }, false);
   c1.addEventListener('touchmove', function(evt) {
+    evt.preventDefault();
     firstTouch(evt, [onMove]);
   }, false);
 
   _id("btn_end").addEventListener('click', function(evt){
+    if( stopAmin ){ stopAmin = false }
 
     var mainParameters = {
       animation: _id("drow_anim_type").value,
@@ -170,6 +163,34 @@ function initEvent(){
     arr = [];
     c1tx.clearRect(0, 0, c1.width, c1.height);
   });
+
+  _id("btn_reset").addEventListener('click', function(evt){
+    if(confirm("Are you sure you want to clear canvas?")){
+      stopAmin = true;
+      arr = getStartArr();
+      c0tx.clearRect(0, 0, c0.width, c0.height);
+    }
+  });
+}
+
+function initMedia(){
+  var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  // console.log("width: "+ width +"px");
+
+  // _id("info_text").innerHTML = width;
+
+  var setWidth = 500;
+
+  if(width <= 512){
+    setWidth = (width - 12);
+  }
+
+  _id("canvas0").setAttribute("width", setWidth);
+  _id("canvas1").setAttribute("width", setWidth);
+  _id("canvas0").setAttribute("height", 500);
+  _id("canvas1").setAttribute("height", 500);
+
+  _id("view").style.width = setWidth + "px";
 }
 
 function _id(id){
@@ -489,35 +510,89 @@ function fillPart(ctx, a, parameter) {
     case "full":
       var i = 0;
       var interval = setInterval(function(){
-        if(i < tempA0.length){
-          drawLP1(i);
-          i++;
-        }else{
-          i = 0;
-          drawLP2();
-          if(endloop){ clearInterval(interval) }
+        if(stopAmin){ clearInterval(interval); } else {
+          if(i < tempA0.length){
+            drawLP1(i);
+            i++;
+          }else{
+            i = 0;
+            drawLP2();
+            if(endloop){ clearInterval(interval); }
+          }
         }
       }, parObj.delay);
     break;
     case "circle":
       var interval = setInterval(function(){
-        for (var i = 0; i < tempA0.length; i++) {
-          drawLP1(i);
+        if(stopAmin){
+          clearInterval(interval);
+        }else{
+          for (var i = 0; i < tempA0.length; i++) {
+            drawLP1(i);
+          }
+          drawLP2();
+          if(endloop){ clearInterval(interval); }
         }
-        drawLP2();
-        if(endloop){ clearInterval(interval) }
       }, parObj.delay);
     break;
     case "no":
       var loop = true;
       while(loop) {
-        for (var i = 0; i < tempA0.length; i++) {
-          drawLP1(i);
+        if(stopAmin){
+           loop = false;
+        }else{
+          for (var i = 0; i < tempA0.length; i++) {
+            drawLP1(i);
+          }
+          drawLP2();
+          if(endloop){ loop = false; }
         }
-        drawLP2();
-        if(endloop){ loop = false; }
       }
     break;
   }
 }
- 
+
+function getStartArr(){
+  var r_arr = [];
+  if(DEV){
+    r_arr = [
+      new Axis(50, 34),
+      new Axis(250, 14),
+      new Axis(490, 70),
+      new Axis(363, 310),
+      new Axis(251, 423),
+      new Axis(55, 423)
+    ];
+
+    testMoving(c0tx);
+    //fillPart(c0tx, arr, {color: "full"});
+    //fillPart(c0tx, arr, {color: "circle"});
+    //fillPart(c0tx, arr, {color: "no"});
+  }else{
+    r_arr = [
+      new Axis(0, 0),
+      new Axis(c0.width, 0),
+      new Axis(c0.width, c0.height),
+      new Axis(0 , c0.height)
+    ];
+  }
+
+  return r_arr;
+}
+
+function invertColor(color_s){
+  var r = parseInt(color_s.substring(1, 3), 16);
+  var g = parseInt(color_s.substring(3, 5), 16);
+  var b = parseInt(color_s.substring(5, 7), 16);
+
+  var hex_r = (255 - r).toString(16);
+  var hex_g = (255 - g).toString(16);
+  var hex_b = (255 - b).toString(16);
+
+  var ret = "#";
+  ret += (255 - r) > 9 ? hex_r : "0"+ hex_r;
+  ret += (255 - g) > 9 ? hex_g : "0"+ hex_g;
+  ret += (255 - b) > 9 ? hex_b : "0"+ hex_b;
+
+  return ret;
+}

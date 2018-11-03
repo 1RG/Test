@@ -2,22 +2,42 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test</title>
     <link rel="stylesheet" href="style.css" charset="utf-8">
   </head>
   <body>
     <div id="view">
-      <canvas id="canvas0" width="500" height="500"></canvas>
-      <canvas id="canvas1" width="500" height="500">Your browser does not support canvas element.</canvas>
+      <canvas id="canvas0" width="100" height="100"></canvas>
+      <canvas id="canvas1" width="100" height="100">Your browser does not support canvas element.</canvas>
     </div>
     <div id="tool">
+      <span>Clear canvas</span>
+      <button id="btn_reset" >Reset</button>
+      <span>Fill in remaining part</span>
       <button id="btn_end">End</button>
+      <span>Animation type</span>
       <select id="drow_anim_type">
+        <span class="tooltiptext">Animation type</span>
         <option value="full">Full</option>
         <option value="circle">Circle</option>
         <option value="no">No</option>
       </select>
+      <span>Animation delay</span>
+      <select id="drow_anim_delay">
+        <option value="1">1</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="60" selected>60</option>
+        <option value="90">90</option>
+        <option value="120">120</option>
+        <option value="240">240</option>
+      </select>
+      <span>Line Color</span>
       <input id="drow_anim_color" type="color" value="#67809f">
+      <span>Line width</span>
       <select id="drow_line_width">
         <option value="0.05">0.05</option>
         <option value="0.1">0.1</option>
@@ -30,6 +50,7 @@
         <option value="7">7</option>
         <option value="10">10</option>
       </select>
+      <span>Line density</span>
       <select id="drow_line_density">
         <option value="1">1</option>
         <option value="2">2</option>
@@ -43,20 +64,9 @@
         <option value="25">25</option>
         <option value="30">30</option>
       </select>
-      <select id="drow_anim_delay">
-        <option value="1">1</option>
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="30">30</option>
-        <option value="60" selected>60</option>
-        <option value="90">90</option>
-        <option value="120">120</option>
-        <option value="240">240</option>
-      </select>
+      <span id="info_text">HTML end<span>
     </div>
     <script src="config.js" charset="utf-8"></script>
     <script src="script.js" charset="utf-8"></script>
   </body>
 </html>
- 
