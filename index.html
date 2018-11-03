@@ -2,13 +2,14 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test</title>
     <link rel="stylesheet" href="style.css" charset="utf-8">
   </head>
   <body>
     <div id="view">
-      <canvas id="canvas0" width="500" height="500"></canvas>
-      <canvas id="canvas1" width="500" height="500">Your browser does not support canvas element.</canvas>
+      <canvas id="canvas0" width="100" height="100"></canvas>
+      <canvas id="canvas1" width="100" height="100">Your browser does not support canvas element.</canvas>
     </div>
     <div id="tool">
       <span>Clear canvas</span>
@@ -63,6 +64,7 @@
         <option value="25">25</option>
         <option value="30">30</option>
       </select>
+      <span id="info_text">HTML end<span>
     </div>
     <script src="config.js" charset="utf-8"></script>
     <script src="script.js" charset="utf-8"></script>

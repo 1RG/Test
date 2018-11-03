@@ -14,6 +14,9 @@ var Axis = function(x, y) {
 }
 
 window.onload = function(){
+  _id("info_text").innerHTML = "JS loading";
+  initMedia();
+
   c0 = _id("canvas0");
   c0tx = c0.getContext("2d");
   c1 = _id("canvas1");
@@ -32,7 +35,10 @@ window.onload = function(){
   }
 
   console.log("all nr ", nr);
+
   initEvent();
+
+  _id("info_text").innerHTML = "";
 };
 
 // ###
@@ -107,7 +113,7 @@ function initEvent(){
       mainCursorArrNr = mi+1;
       drawCursor(c1tx, mo.x, mo.y);
       if(eMousedown){
-        drawLine(c1tx, mainCursor, "#ffff00");
+        drawLine(c1tx, mainCursor, invertColor( _id("drow_anim_color").value ));
       }
     }
     //console.log(mainCursorArrNr, mo);
@@ -129,12 +135,15 @@ function initEvent(){
   }
 
   c1.addEventListener('touchstart', function(evt) {
+    evt.preventDefault();
     firstTouch(evt, [onMove, onDown]);
   }, false);
   c1.addEventListener('touchend', function(evt) {
+    evt.preventDefault();
     firstTouch(evt, [onUp]);
   }, false);
   c1.addEventListener('touchmove', function(evt) {
+    evt.preventDefault();
     firstTouch(evt, [onMove]);
   }, false);
 
@@ -162,6 +171,25 @@ function initEvent(){
       c0tx.clearRect(0, 0, c0.width, c0.height);
     }
   });
+}
+
+function initMedia(){
+  var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  // console.log("width: "+ width +"px");
+  // _id("info_text").innerHTML = width;
+
+  var setWidth = 500;
+
+  if(width <= 512){
+    setWidth = (width - 12);
+  }
+
+  _id("canvas0").setAttribute("width", setWidth);
+  _id("canvas1").setAttribute("width", setWidth);
+  _id("canvas0").setAttribute("height", 500);
+  _id("canvas1").setAttribute("height", 500);
+
+  _id("view").style.width = setWidth + "px";
 }
 
 function _id(id){
@@ -549,4 +577,21 @@ function getStartArr(){
   }
 
   return r_arr;
+}
+
+function invertColor(color_s){
+  var r = parseInt(color_s.substring(1, 3), 16);
+  var g = parseInt(color_s.substring(3, 5), 16);
+  var b = parseInt(color_s.substring(5, 7), 16);
+
+  var hex_r = (255 - r).toString(16);
+  var hex_g = (255 - g).toString(16);
+  var hex_b = (255 - b).toString(16);
+
+  var ret = "#";
+  ret += (255 - r) > 9 ? hex_r : "0"+ hex_r;
+  ret += (255 - g) > 9 ? hex_g : "0"+ hex_g;
+  ret += (255 - b) > 9 ? hex_b : "0"+ hex_b;
+
+  return ret;
 }
