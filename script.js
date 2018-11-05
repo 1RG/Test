@@ -73,7 +73,7 @@ function initEvent(){
         addNewLine();
 
         var delPartArr = deleteMinPart();
-        console.log(delPartArr);
+        // console.log(delPartArr);
 
         fillPart(c0tx, delPartArr, mainParameters);
 
@@ -176,7 +176,6 @@ function initEvent(){
 function initMedia(){
   var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
   // console.log("width: "+ width +"px");
-
   // _id("info_text").innerHTML = width;
 
   var setWidth = 500;
@@ -256,6 +255,14 @@ function testDot(ctx) {
 }
 
 function pointsCoordinatesCross(arrA, n, method, bre = 0) {
+  if(_id("drow_line_density").value < 10){
+    pointsCoordinatesCrossVersionFloat(arrA, n, method, bre);
+  }else{
+    pointsCoordinatesCrossVersionInteger(arrA, n, method, bre);
+  }
+}
+
+function pointsCoordinatesCrossVersionInteger(arrA, n, method, bre = 0) {
   var x1 = arrA[n].x;
   var y1 = arrA[n].y;
   if(arrA.length != n+1){
@@ -271,7 +278,7 @@ function pointsCoordinatesCross(arrA, n, method, bre = 0) {
 
   var breCount = null;
   function met() {
-    method(new Axis(tx, ty));
+   method(new Axis(tx, ty));
     if(bre>0){
       breCount++;
     }
@@ -311,12 +318,88 @@ function pointsCoordinatesCross(arrA, n, method, bre = 0) {
 
       if(useSF_x){
         if(x1 < x2){ tx++; }else{ tx--; }
-        ty =  Math.round(m * tx + b);
-        loopRun = tx != x2;
+       ty =  Math.round(m * tx + b);
+
+       loopRun = tx != x2;
       }else{
         if(y1 < y2){ ty++; }else{ ty--; }
-        tx = Math.round(((b - ty) / m) * (-1));
-        loopRun = ty != y2;
+       tx = Math.round(((b - ty) / m) * (-1));
+
+       loopRun = ty != y2;
+      }
+      met();
+      if(breCount == bre){
+        break;
+      }
+    }
+    return;
+  }
+}
+
+function pointsCoordinatesCrossVersionFloat(arrA, n, method, bre = 0) {
+  var x1 = arrA[n].x;
+  var y1 = arrA[n].y;
+  if(arrA.length != n+1){
+    var x2 = arrA[n+1].x;
+    var y2 = arrA[n+1].y;
+  }else{
+    var x2 = arrA[0].x;
+    var y2 = arrA[0].y;
+  }
+
+  var tx = x1;
+  var ty = y1;
+
+  var breCount = null;
+  function met() {
+    method(new Axis((Math.round(tx * 100) / 100), (Math.round(ty * 100) / 100)));
+    if(bre>0){
+      breCount++;
+    }
+  }
+
+  if(Math.round(x1) == Math.round(x2)){
+    while ((Math.round(ty) == Math.round(y2)) == false) {
+      if(y1 < y2){ ty++; }else{ ty--; }
+      met();
+      if(breCount == bre){
+        break;
+      }
+    }
+    return;
+  }
+
+  if(Math.round(y1) == Math.round(y2)){
+    while ((Math.round(tx) == Math.round(x2)) == false) {
+      if(x1 < x2){ tx++; }else{ tx--; }
+      met();
+      if(breCount == bre){
+        break;
+      }
+    }
+    return;
+  }
+
+  if(Math.round(x1) != Math.round(x2) && Math.round(y1) != Math.round(y2)){
+    var useSF_x =  Math.abs(x1 - x2) > Math.abs(y1 - y2);
+    var loopRun = true;
+    while (loopRun) {
+      //http://stackoverflow.com/questions/13491676/get-all-pixel-coordinates-between-2-points
+      //slope (Krypties koeficiento)
+      var m = (y2 - y1) / (x2 - x1);
+      //intercept
+      var b = y1 - m * x1;
+
+      if(useSF_x){
+        if(x1 < x2){ tx++; }else{ tx--; }
+        ty = m * tx + b;
+
+        loopRun = Math.round(tx) != Math.round(x2);
+      }else{
+        if(y1 < y2){ ty++; }else{ ty--; }
+        tx = ((b - ty) / m) * (-1);
+
+        loopRun = Math.round(ty) != Math.round(y2);
       }
       met();
       if(breCount == bre){
@@ -475,33 +558,38 @@ function fillPart(ctx, a, parameter) {
     }, parObj.density);
   }
   function drawLP2(){
-    // #1/3 Klaidos gaudimas
+    // #1/4 Klaidos gaudimas
     try {
       draw(tempA1[tempA1.length-1], tempA1[0]);
       testLoopEnd(tempA1[tempA1.length-1], tempA1[0], true);
     } catch (e) {
-      console.log("F");
+      // console.log("F");
       endloop = true;
     }
     tempA0 = tempA1;
-    console.log(tempA0);
+    // console.log(tempA0);
     tempA1 = [];
   }
   function testLoopEnd(p0, p1, check){
       perim += getDistance(p0.x, p0.y, p1);
       if(check){
-        //#2/3 Vienodas perimetras
+        //#2/4 Vienodas perimetras
         if(Math.round(perim) == prevPerim){
           prevPerimCoun++;
         }
         prevPerim = Math.round(perim);
 
-        //#3/3 Kampu skaičius
+        //#3/4 Kampu skaičius
         if(prevPerimCoun == maxPrevPerimCoun || tempA1.length<=2){//a.length){
           endloop = true;
         }
 
-        console.log((tempA1.length<a.length),endloop, perim);
+        //#4/4 Mazas perimetras
+        if(perim <= 10){
+          endloop = true;
+        }
+
+//        console.log((tempA1.length<a.length),endloop, perim);
         perim = 0;
     }
   }
