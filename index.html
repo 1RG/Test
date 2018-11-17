@@ -7,11 +7,8 @@
     <link rel="stylesheet" href="style.css" charset="utf-8">
   </head>
   <body>
-    <div id="view">
-      <canvas id="canvas0" width="100" height="100"></canvas>
-      <canvas id="canvas1" width="100" height="100">Your browser does not support canvas element.</canvas>
-    </div>
-    <div id="tool">
+    <div id="sidenav_back"></div>
+    <div id="sidenav">
       <span>Clear canvas</span>
       <button id="btn_reset" >Reset</button>
       <span>Fill in remaining part</span>
@@ -64,8 +61,17 @@
         <option value="25">25</option>
         <option value="30">30</option>
       </select>
-      <span id="info_text">HTML end<span>
     </div>
+    <div id="tool">
+      <button id="tool_menu_btn" title="Menu">Menu &#9776;</button>
+      <button id="tool_btn_reset" title="Clear canvas">Reset &#8635;</button>
+      <button id="tool_btn_end" title="Fill in remaining part">End &#8718;</button>
+    </div>
+    <div id="view">
+      <canvas id="canvas0" width="100" height="100"></canvas>
+      <canvas id="canvas1" width="100" height="100">Your browser does not support canvas element.</canvas>
+    </div>
+    <span id="info_text">HTML end</span>
     <script src="config.js" charset="utf-8"></script>
     <script src="script.js" charset="utf-8"></script>
   </body>

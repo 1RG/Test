@@ -30,7 +30,7 @@ window.onload = function(){
       pointsCoordinatesCross(arr, i, function(e){
         nr++;
   //      console.log(nr, e, i);
-      });
+      }, 0);
   //    console.log("=== ", i, (nr-len));
   }
 
@@ -45,7 +45,6 @@ window.onload = function(){
 
 function initEvent(){
   var onDown = function(evt) {
-    console.log(evt.button);
     if(evt.button == 0){
       if(DEV){ drawCursor(c0tx, mainCursor.x, mainCursor.y, "#00ff00"); }
       eMousedown = true;
@@ -107,13 +106,13 @@ function initEvent(){
             mo = e;
             mi = i;
           }
-        });
+        }, 0);
       }
       mainCursor = mo;
       mainCursorArrNr = mi+1;
-      drawCursor(c1tx, mo.x, mo.y);
+      drawCursor(c1tx, mo.x, mo.y, '#ff0000');
       if(eMousedown){
-        drawLine(c1tx, mainCursor, invertColor( _id("drow_anim_color").value ));
+        drawLine(c1tx, mainCursor, invertColor( _id("drow_anim_color").value ), 3);
       }
     }
     //console.log(mainCursorArrNr, mo);
@@ -128,11 +127,11 @@ function initEvent(){
     if(touches.length > 0){
       touches[0].button = 0;
 
-      for (var event_function of event_function_arr) {
-        event_function(touches[0]);
+      for(var i = 0; i < event_function_arr.length;  i++){
+        event_function_arr[i](touches[0]);
       }
     }
-  }
+  };
 
   c1.addEventListener('touchstart', function(evt) {
     evt.preventDefault();
@@ -147,7 +146,7 @@ function initEvent(){
     firstTouch(evt, [onMove]);
   }, false);
 
-  _id("btn_end").addEventListener('click', function(evt){
+  var onDrawEnd = function(){
     if( stopAmin ){ stopAmin = false }
 
     var mainParameters = {
@@ -162,15 +161,48 @@ function initEvent(){
 
     arr = [];
     c1tx.clearRect(0, 0, c1.width, c1.height);
-  });
+  };
 
-  _id("btn_reset").addEventListener('click', function(evt){
+  _id("btn_end").addEventListener('click', onDrawEnd, false);
+  _id("tool_btn_end").addEventListener('click', onDrawEnd, false);
+
+  var onReset = function(){
     if(confirm("Are you sure you want to clear canvas?")){
       stopAmin = true;
       arr = getStartArr();
       c0tx.clearRect(0, 0, c0.width, c0.height);
     }
-  });
+  };
+
+  _id("btn_reset").addEventListener('click', onReset, false);
+  _id("tool_btn_reset").addEventListener('click', onReset, false);
+
+  _id("tool_menu_btn").addEventListener('click', function(){
+    _id("sidenav").style.width = "230px";
+    _id("sidenav").classList.add("sidenav_shadow");
+    _id("sidenav_back").style.width = "100%";
+    _id("sidenav_back").style.opacity = "0.5";
+  }, false);
+
+  var onSidenavBack = function(){
+    _id("sidenav").style.width = "0px";
+    _id("sidenav_back").style.opacity = "0";
+
+    setTimeout(function(){
+      _id("sidenav_back").style.width = "0%";
+      _id("sidenav").classList.remove("sidenav_shadow");
+    }, 500);
+  };
+
+  _id("sidenav_back").addEventListener('click', onSidenavBack, false);
+
+  window.addEventListener("keydown", function (evt) {
+    if(evt.key == "Escape"){
+      if(_id("sidenav").offsetWidth != 0){
+        onSidenavBack();
+      }
+    }
+  }, false);
 }
 
 function initMedia(){
@@ -196,7 +228,7 @@ function _id(id){
   return document.getElementById(id);
 }
 
-function drawCursor(ctx, x, y, rgb = '#ff0000') {
+function drawCursor(ctx, x, y, rgb) {
   var a = 30;
   ctx.beginPath();
   ctx.moveTo( x, y-a/2 ); //250, 225
@@ -254,7 +286,7 @@ function testDot(ctx) {
   ctx.stroke();
 }
 
-function pointsCoordinatesCross(arrA, n, method, bre = 0) {
+function pointsCoordinatesCross(arrA, n, method, bre) {
   if(_id("drow_line_density").value < 10){
     pointsCoordinatesCrossVersionFloat(arrA, n, method, bre);
   }else{
@@ -262,7 +294,7 @@ function pointsCoordinatesCross(arrA, n, method, bre = 0) {
   }
 }
 
-function pointsCoordinatesCrossVersionInteger(arrA, n, method, bre = 0) {
+function pointsCoordinatesCrossVersionInteger(arrA, n, method, bre) {
   var x1 = arrA[n].x;
   var y1 = arrA[n].y;
   if(arrA.length != n+1){
@@ -336,7 +368,7 @@ function pointsCoordinatesCrossVersionInteger(arrA, n, method, bre = 0) {
   }
 }
 
-function pointsCoordinatesCrossVersionFloat(arrA, n, method, bre = 0) {
+function pointsCoordinatesCrossVersionFloat(arrA, n, method, bre) {
   var x1 = arrA[n].x;
   var y1 = arrA[n].y;
   if(arrA.length != n+1){
@@ -410,7 +442,7 @@ function pointsCoordinatesCrossVersionFloat(arrA, n, method, bre = 0) {
   }
 }
 
-function drawLine(ctx, endAxis, rgb = '#000000', width = 3){
+function drawLine(ctx, endAxis, rgb, width){
   if(eMDCursor != null){
     ctx.beginPath();
     ctx.moveTo( eMDCursor.x, eMDCursor.y );
@@ -430,7 +462,7 @@ function countingSidesperimimeter(arrNr1, arrNr2){
     var nr = 0;
     pointsCoordinatesCross(arr, i, function(e){
       nr++;
-    });
+    }, 0);
 
     if(arrNr1<arrNr2){
       if(arrNr1<=i && i<arrNr2){
