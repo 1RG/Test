@@ -13,6 +13,9 @@ var Axis = function(x, y) {
   this.y = y;
 }
 
+var drawMemory = [];
+var currentMemoryPoint = 0;
+
 window.onload = function(){
   _id("info_text").innerHTML = "JS loading";
   initMedia();
@@ -26,7 +29,7 @@ window.onload = function(){
 
   var nr = 0;
   for (var i = 0; i < arr.length; i++) {
-      var len = nr;
+
       pointsCoordinatesCross(arr, i, function(e){
         nr++;
   //      console.log(nr, e, i);
@@ -44,6 +47,9 @@ window.onload = function(){
 // ###
 
 function initEvent(){
+
+  // Init event function
+
   var onDown = function(evt) {
     if(evt.button == 0){
       if(DEV){ drawCursor(c0tx, mainCursor.x, mainCursor.y, "#00ff00"); }
@@ -60,12 +66,14 @@ function initEvent(){
       if(DEV){ drawCursor(c0tx, mainCursor.x, mainCursor.y, "#0000ff"); }
       if(mainCursorArrNr != eMDCursorArrNr && eMousedown){
         var mainParameters = {
-          animation: _id("drow_anim_type").value,
-          color: _id("drow_anim_color").value,
-          width: _id("drow_line_width").value,
-          density: _id("drow_line_density").value,
-          delay: _id("drow_anim_delay").value
+          animation: _id("draw_anim_type").value,
+          color: _id("draw_anim_color").value,
+          width: _id("draw_line_width").value,
+          density: _id("draw_line_density").value,
+          delay: _id("draw_anim_delay").value
         };
+
+        // console.log(mainCursor);
 
         drawLine(c0tx, mainCursor, mainParameters.color, mainParameters.width);
 
@@ -73,6 +81,13 @@ function initEvent(){
 
         var delPartArr = deleteMinPart();
         // console.log(delPartArr);
+
+        var tempDrawMemory = [];
+        for (var i = 0; i < currentMemoryPoint; i++) {
+          tempDrawMemory.push( drawMemory[i] );
+        }
+        tempDrawMemory.push({"line": {"str": eMDCursor, "end": mainCursor}});
+        setUnRedoVariables(tempDrawMemory, (currentMemoryPoint + 1), false, true, (currentMemoryPoint + 1), 0);
 
         fillPart(c0tx, delPartArr, mainParameters);
 
@@ -112,15 +127,11 @@ function initEvent(){
       mainCursorArrNr = mi+1;
       drawCursor(c1tx, mo.x, mo.y, '#ff0000');
       if(eMousedown){
-        drawLine(c1tx, mainCursor, invertColor( _id("drow_anim_color").value ), 3);
+        drawLine(c1tx, mainCursor, invertColor( _id("draw_anim_color").value ), 3);
       }
     }
     //console.log(mainCursorArrNr, mo);
   };
-
-  c1.addEventListener('mousedown', onDown, false);
-  c1.addEventListener('mouseup', onUp, false);
-  c1.addEventListener('mousemove', onMove, false);
 
   var firstTouch = function(evt, event_function_arr){
     var touches = evt.changedTouches;
@@ -132,6 +143,103 @@ function initEvent(){
       }
     }
   };
+
+  var onDrawEnd = function(){
+    if( stopAmin ){ stopAmin = false }
+
+    var mainParameters = {
+      animation: _id("draw_anim_type").value,
+      color: _id("draw_anim_color").value,
+      width: _id("draw_line_width").value,
+      density: _id("draw_line_density").value,
+      delay: _id("draw_anim_delay").value
+    };
+
+    fillPart(c0tx, arr, mainParameters);
+
+    if(arr.length != 0){
+      var tempDrawMemory = [];
+      for (var i = 0; i < currentMemoryPoint; i++) {
+        tempDrawMemory.push( drawMemory[i] );
+      }
+      tempDrawMemory.push({"line": "end"});
+      setUnRedoVariables(tempDrawMemory, (currentMemoryPoint + 1), false, true, (currentMemoryPoint + 1), 0);
+    }
+
+    arr = [];
+    c1tx.clearRect(0, 0, c1.width, c1.height);
+  };
+
+  var onReset = function(){
+    if(confirm("Are you sure you want to clear canvas?")){
+      stopAmin = true;
+      arr = getStartArr();
+      c0tx.clearRect(0, 0, c0.width, c0.height);
+
+      setUnRedoVariables([], 0, true, true, 0, 0);
+    }
+  };
+
+  var onSidenavBack = function(){
+    _id("sidenav").style.width = "0px";
+    _id("sidenav_back").style.opacity = "0";
+
+    setTimeout(function(){
+      _id("sidenav_back").style.width = "0%";
+      _id("sidenav").classList.remove("sidenav_shadow");
+    }, 500);
+  };
+
+  var makeUndoRedo = function(point_act){
+    stopAmin = true;
+    setTimeout(function(){
+      stopAmin = false;
+
+      if(((currentMemoryPoint + point_act)) >= 0 && ((currentMemoryPoint + point_act) <= drawMemory.length)){
+        c1tx.clearRect(0, 0, c1.width, c1.height);
+
+        var mainParameters = {
+          animation: "no",
+          color: _id("draw_anim_color").value,
+          width: _id("draw_line_width").value,
+          density: _id("draw_line_density").value,
+          delay: _id("draw_anim_delay").value
+        };
+        var undoDrawArr = [];
+
+        arr = getStartArr();
+
+        c0tx.clearRect(0, 0, c0.width, c0.height);
+
+        currentMemoryPoint += point_act;
+
+        for (var i = 0; i < (currentMemoryPoint); i++) {
+          undoDrawArr.push(drawMemory[i]);
+        }
+
+        fillPartArr(c0tx, undoDrawArr, mainParameters);
+      }
+
+      var temp_btn_undo = false;
+      var temp_btn_redo = false;
+      if(currentMemoryPoint == 0){
+        temp_btn_undo = true;
+      }
+      if((drawMemory.length - currentMemoryPoint) == 0){
+        temp_btn_redo = true;
+      }
+
+      setUnRedoVariables("", "", temp_btn_undo, temp_btn_redo, currentMemoryPoint, (drawMemory.length - currentMemoryPoint));
+    }, (_id("draw_anim_delay").value + 1));
+  };
+
+  // Mouse event
+
+  c1.addEventListener('mousedown', onDown, false);
+  c1.addEventListener('mouseup', onUp, false);
+  c1.addEventListener('mousemove', onMove, false);
+
+  // Touch event
 
   c1.addEventListener('touchstart', function(evt) {
     evt.preventDefault();
@@ -146,33 +254,10 @@ function initEvent(){
     firstTouch(evt, [onMove]);
   }, false);
 
-  var onDrawEnd = function(){
-    if( stopAmin ){ stopAmin = false }
-
-    var mainParameters = {
-      animation: _id("drow_anim_type").value,
-      color: _id("drow_anim_color").value,
-      width: _id("drow_line_width").value,
-      density: _id("drow_line_density").value,
-      delay: _id("drow_anim_delay").value
-    };
-
-    fillPart(c0tx, arr, mainParameters);
-
-    arr = [];
-    c1tx.clearRect(0, 0, c1.width, c1.height);
-  };
+  // Button event
 
   _id("btn_end").addEventListener('click', onDrawEnd, false);
   _id("tool_btn_end").addEventListener('click', onDrawEnd, false);
-
-  var onReset = function(){
-    if(confirm("Are you sure you want to clear canvas?")){
-      stopAmin = true;
-      arr = getStartArr();
-      c0tx.clearRect(0, 0, c0.width, c0.height);
-    }
-  };
 
   _id("btn_reset").addEventListener('click', onReset, false);
   _id("tool_btn_reset").addEventListener('click', onReset, false);
@@ -184,44 +269,48 @@ function initEvent(){
     _id("sidenav_back").style.opacity = "0.5";
   }, false);
 
-  var onSidenavBack = function(){
-    _id("sidenav").style.width = "0px";
-    _id("sidenav_back").style.opacity = "0";
-
-    setTimeout(function(){
-      _id("sidenav_back").style.width = "0%";
-      _id("sidenav").classList.remove("sidenav_shadow");
-    }, 500);
-  };
-
   _id("sidenav_back").addEventListener('click', onSidenavBack, false);
 
+  _id("btn_undo").addEventListener('click', function(){
+    makeUndoRedo(-1);
+  }, false);
+  _id("btn_redo").addEventListener('click', function(){
+    makeUndoRedo(1);
+  }, false);
+
+  // Key event
+
   window.addEventListener("keydown", function (evt) {
-    if(evt.key == "Escape"){
+    if(evt.code == "Escape"){
       if(_id("sidenav").offsetWidth != 0){
         onSidenavBack();
       }
+    }
+    if(evt.ctrlKey && evt.code == "KeyZ"){
+        makeUndoRedo(-1);
+    }
+    if(evt.ctrlKey && evt.code == "KeyY"){
+        makeUndoRedo(1);
     }
   }, false);
 }
 
 function initMedia(){
   var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
   // console.log("width: "+ width +"px");
   // _id("info_text").innerHTML = width;
 
-  var setWidth = 500;
-
-  if(width <= 512){
-    setWidth = (width - 12);
-  }
+  var setWidth = width - 12;
+  var setHeight = height - 12 - 35;
 
   _id("canvas0").setAttribute("width", setWidth);
   _id("canvas1").setAttribute("width", setWidth);
-  _id("canvas0").setAttribute("height", 500);
-  _id("canvas1").setAttribute("height", 500);
+  _id("canvas0").setAttribute("height", setHeight);
+  _id("canvas1").setAttribute("height", setHeight);
 
   _id("view").style.width = setWidth + "px";
+  _id("view").style.height = setHeight + "px";
 }
 
 function _id(id){
@@ -287,7 +376,7 @@ function testDot(ctx) {
 }
 
 function pointsCoordinatesCross(arrA, n, method, bre) {
-  if(_id("drow_line_density").value < 10){
+  if(_id("draw_line_density").value < 10){
     pointsCoordinatesCrossVersionFloat(arrA, n, method, bre);
   }else{
     pointsCoordinatesCrossVersionInteger(arrA, n, method, bre);
@@ -537,7 +626,7 @@ function deleteMinPart(){
   return delArr;
 }
 
-function fillPart(ctx, a, parameter) {
+function fillPart(ctx, aa, parameter) {
   var parObj = {
     animation: "full",
     color: "#38475c",
@@ -565,8 +654,8 @@ function fillPart(ctx, a, parameter) {
   var maxPrevPerimCoun = 10;
 
   var nr = 0;
-  var temp = a[0];
-  var tempA0 = a;
+  var temp = aa[0];
+  var tempA0 = aa;
   var tempA1 = [];
 
   var endloop = false;
@@ -612,7 +701,7 @@ function fillPart(ctx, a, parameter) {
         prevPerim = Math.round(perim);
 
         //#3/4 Kampu skaičius
-        if(prevPerimCoun == maxPrevPerimCoun || tempA1.length<=2){//a.length){
+        if(prevPerimCoun == maxPrevPerimCoun || tempA1.length<=2){//aa.length){
           endloop = true;
         }
 
@@ -621,7 +710,7 @@ function fillPart(ctx, a, parameter) {
           endloop = true;
         }
 
-//        console.log((tempA1.length<a.length),endloop, perim);
+//        console.log((tempA1.length<aa.length),endloop, perim);
         perim = 0;
     }
   }
@@ -715,4 +804,61 @@ function invertColor(color_s){
   ret += (255 - b) > 9 ? hex_b : "0"+ hex_b;
 
   return ret;
+}
+
+function fillPartArr(ctx, aa, parameter){
+  var getCursorArrNr = function(point){
+    var m = getDistance(point.x, point.y, arr[0]);
+    var mi = 0;
+    for (var f = 0; f < arr.length; f++) {
+      pointsCoordinatesCross(arr, f, function(e){
+        var t = getDistance(point.x, point.y, e);
+        if(t < m){
+          m = t;
+          mi = f;
+        }
+      }, 0);
+    }
+    return mi+1;
+  };
+
+  for (var i = 0; i < aa.length; i++) {
+    if(aa[i].line !== "end"){
+      eMDCursor = aa[i].line.str;
+      mainCursor = aa[i].line.end;
+
+      drawLine(ctx, mainCursor, parameter.color, parameter.width);
+
+      eMDCursorArrNr = getCursorArrNr(eMDCursor);
+      mainCursorArrNr = getCursorArrNr(mainCursor);
+      addNewLine();
+
+      var delPartArr = deleteMinPart();
+
+      fillPart(ctx, delPartArr, parameter);
+    }else{
+      fillPart(ctx, arr, parameter);
+    }
+  }
+}
+
+function setUnRedoVariables(set_draw_memory, set_memory_point, is_undo_disabled, is_redo_disabled, set_undo_html, set_redo_html){
+  if(set_draw_memory !== ""){
+    drawMemory = set_draw_memory;
+  }
+  if(set_memory_point !== ""){
+    currentMemoryPoint = set_memory_point;
+  }
+  if(is_undo_disabled !== ""){
+    _id("btn_undo").disabled = is_undo_disabled;
+  }
+  if(is_redo_disabled !== ""){
+    _id("btn_redo").disabled = is_redo_disabled;
+  }
+  if(set_undo_html !== ""){
+    _id("btn_undo_nr").innerHTML = set_undo_html;
+  }
+  if(set_redo_html !== ""){
+    _id("btn_redo_nr").innerHTML = set_redo_html;
+  }
 }

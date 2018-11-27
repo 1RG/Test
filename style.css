@@ -46,6 +46,8 @@ input[type="color"]{
   font-size: 14px;
 }
 
+/* SideNav */
+
 #sidenav{
   width: 0px;
   height: 100%;
@@ -67,7 +69,7 @@ input[type="color"]{
   font-size: 14px;
 }
 
-#sidenav span, #sidenav button, #sidenav select, #sidenav option{
+#sidenav  > span, #sidenav > button, #sidenav > select, #sidenav > option{
   display: block;
 }
 
@@ -89,6 +91,20 @@ input[type="color"]{
   box-shadow: 0px 0px 20px 5px #000;
 }
 
+.unredo_block {
+  width: 230px;
+}
+
+.unredo_block button{
+  display: inline;
+}
+
+#sidenav > .unredo_block > button > span{
+  margin: 0px;
+}
+
+/* View */
+
 #canvas0{ z-index: 0; }
 #canvas1{ z-index: 1; }
 
@@ -99,20 +115,22 @@ input[type="color"]{
   border: 1px solid #0f0f0f;
 
   width: 300px;
-  height: 500px;
+  height: 300px;
 
   float: left;
 }
 
+/* Tool */
+
 #tool{
-  margin: 5px;
+  margin: 5px 5px 0px 5px;
   width: auto;
   height: 29px;
 }
 
 #tool button{
   float: left;
-  margin-right: 10px;
+  margin-right: 5px;
   height: 100%;
   width: 100px;
   border: solid #ddd 2px;
