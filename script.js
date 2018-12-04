@@ -192,6 +192,7 @@ function initEvent(){
 
   var makeUndoRedo = function(point_act){
     stopAmin = true;
+    // TODO: Can be optimize
     setTimeout(function(){
       stopAmin = false;
 
@@ -276,6 +277,33 @@ function initEvent(){
   }, false);
   _id("btn_redo").addEventListener('click', function(){
     makeUndoRedo(1);
+  }, false);
+  _id("btn_download").addEventListener('click', function(){
+    var file_name = 'line_draw_'+getDateAndTimeString()+'.png';
+
+    if((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)){
+      // IE
+      window.navigator.msSaveBlob(_id("canvas0").msToBlob(), file_name);
+    }else{
+      // Others
+      var link = _id("btn_download_a");
+      link.download = file_name;
+      link.href = _id("canvas0").toDataURL("image/png").replace("image/png", "image/octet-stream");
+      link.click();
+    }
+  }, false);
+  _id("btn_view_data").addEventListener('click', function(){
+    var dataURL = _id("canvas0").toDataURL("image/png");
+
+    if(navigator.userAgent.indexOf("Firefox") != -1 ){
+      // Firefox
+      window.open( dataURL, "_blank" );
+    }else{
+      // Others
+      var win = window.open( "", "_blank" );
+      win.document.write('<img src="'+dataURL+'"/>');
+      win.document.body.style.backgroundColor = "#f0f0f0";
+    }
   }, false);
 
   // Key event
@@ -838,6 +866,7 @@ function fillPartArr(ctx, aa, parameter){
       fillPart(ctx, delPartArr, parameter);
     }else{
       fillPart(ctx, arr, parameter);
+      arr = [];
     }
   }
 }
@@ -861,4 +890,22 @@ function setUnRedoVariables(set_draw_memory, set_memory_point, is_undo_disabled,
   if(set_redo_html !== ""){
     _id("btn_redo_nr").innerHTML = set_redo_html;
   }
+}
+
+function getDateAndTimeString(){
+  var setZ_NN = function( time ){
+  	if ( time < 10 ){
+  		if ( time == 0 ){
+  			time = "00";
+  		}else{
+  			time = "0" + time;
+  		}
+  	}
+  	return time;
+  };
+
+  var d = new Date();
+
+  return d.getFullYear() + "_" + setZ_NN((d.getMonth() + 1)) + "_" + setZ_NN(d.getDate()) + "_" +
+  setZ_NN(d.getHours()) + "_" + setZ_NN(d.getMinutes()) + "_" + setZ_NN(d.getSeconds());
 }
