@@ -1,3 +1,4 @@
+// --------- Public variables ---------
 var c0, c1;
 var c0tx, c1tx;
 
@@ -15,7 +16,9 @@ var Axis = function(x, y) {
 
 var drawMemory = [];
 var currentMemoryPoint = 0;
+// ---------
 
+// --------- On load page ---------
 window.onload = function(){
   _id("info_text").innerHTML = "JS loading";
   initMedia();
@@ -43,9 +46,9 @@ window.onload = function(){
 
   _id("info_text").innerHTML = "";
 };
+// ---------
 
-// ###
-
+// --------- Public JavaScript function ---------
 function initEvent(){
 
   // Init event function
@@ -271,6 +274,7 @@ function initEvent(){
   }, false);
 
   _id("sidenav_back").addEventListener('click', onSidenavBack, false);
+  _id("sidenav_close_btn").addEventListener('click', onSidenavBack, false);
 
   _id("btn_undo").addEventListener('click', function(){
     makeUndoRedo(-1);
@@ -306,6 +310,30 @@ function initEvent(){
     }
   }, false);
 
+  _id("btn_set_draw_size").addEventListener('click', function(){
+    var set_draw_size_w = _id("draw_size_w").value;
+    var set_draw_size_h = _id("draw_size_h").value;
+
+    if(set_draw_size_w == c0.width && set_draw_size_h == c0.height){
+      alert("Set size equal current canvas size");
+      return;
+    }
+
+    if(drawMemory.length){
+      if(!confirm("During this action your current draw will be lost. Are you sure you want to change canvas size?")){
+        return;
+      }
+    }
+
+    setDrawScreenSize(set_draw_size_w, set_draw_size_h);
+
+    stopAmin = true;
+    arr = getStartArr();
+    c0tx.clearRect(0, 0, c0.width, c0.height);
+
+    setUnRedoVariables([], 0, true, true, 0, 0);
+  }, false);
+
   // Key event
 
   window.addEventListener("keydown", function (evt) {
@@ -331,7 +359,14 @@ function initMedia(){
 
   var setWidth = width - 12;
   var setHeight = height - 12 - 35;
+  setDrawScreenSize(setWidth, setHeight);
+}
 
+function _id(id){
+  return document.getElementById(id);
+}
+
+function setDrawScreenSize(setWidth, setHeight){
   _id("canvas0").setAttribute("width", setWidth);
   _id("canvas1").setAttribute("width", setWidth);
   _id("canvas0").setAttribute("height", setHeight);
@@ -339,10 +374,9 @@ function initMedia(){
 
   _id("view").style.width = setWidth + "px";
   _id("view").style.height = setHeight + "px";
-}
 
-function _id(id){
-  return document.getElementById(id);
+  _id("draw_size_w").value = setWidth;
+  _id("draw_size_h").value = setHeight;
 }
 
 function drawCursor(ctx, x, y, rgb) {
@@ -909,3 +943,4 @@ function getDateAndTimeString(){
   return d.getFullYear() + "_" + setZ_NN((d.getMonth() + 1)) + "_" + setZ_NN(d.getDate()) + "_" +
   setZ_NN(d.getHours()) + "_" + setZ_NN(d.getMinutes()) + "_" + setZ_NN(d.getSeconds());
 }
+// ---------

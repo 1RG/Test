@@ -4,6 +4,7 @@ body {
   padding: 0px;
   margin: 0px;
   font-family: "Calibri";
+  font-weight: 100;
 }
 
 canvas{
@@ -13,13 +14,6 @@ canvas{
 }
 
 /* color: #ddd - #ccc - #bbb */
-button{
-  background-color: #ddd;
-  border: none;
-  padding: 3px 15px;
-  font-size: 14px;
-}
-
 button:hover {
   background-color: #ccc;
 }
@@ -28,22 +22,17 @@ button:active {
   background-color: #bbb;
 }
 
-select{
+button, select, input[type="color"] {
   background-color: #ddd;
   border: none;
-  padding: 3px 15px;
-  font-size: 14px;
+  padding: 2px 15px;
+  font-size: 16px;
+  font-family: "Calibri";
+  font-weight: 100;
 }
 
 select::after{
   background-color: #ddd;
-}
-
-input[type="color"]{
-  background-color: #ddd;
-  border: none;
-  padding: 3px 15px;
-  font-size: 14px;
 }
 
 /* SideNav */
@@ -51,7 +40,7 @@ input[type="color"]{
 #sidenav{
   width: 0px;
   height: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
   position: fixed;
   z-index: 2;
   transition: 0.5s;
@@ -60,16 +49,55 @@ input[type="color"]{
   left: 0px;
 }
 
-#sidenav button, #sidenav select, #sidenav input, #sidenav span{
+.sidenav_cont_title, .sidenav_cont{
+  width: 230px;
+}
+
+.sidenav_cont_title{
+  height: 32px;
+}
+
+.sidenav_cont{
+  height: calc(100% - 32px); /* css3 */
+  overflow-x: hidden;
+}
+
+.sidenav_cont_title span{
+  margin: 5px 10px;
+  font-size: 16px;
+}
+
+.sidenav_cont_title .text{
+  font-weight: bold;
+  float: left;
+}
+
+#sidenav_close_btn{
+  float: right;
+  background-color: #f0f0f0;
+  padding: 0px;
+  margin: 2px;
+  padding: 3px 8px;
+}
+
+#sidenav_close_btn:hover {
+  background-color: #ccc;
+}
+
+#sidenav_close_btn:active {
+  background-color: #bbb;
+}
+
+.sidenav_cont button, .sidenav_cont select, .sidenav_cont input, .sidenav_cont span{
   margin: 5px 10px;
 }
 
-#sidenav span{
+.sidenav_cont span{
   width: 210px;
   font-size: 14px;
 }
 
-#sidenav  > span, #sidenav > button, #sidenav > select, #sidenav > option{
+.sidenav_cont  > span, .sidenav_cont > button, .sidenav_cont > select, .sidenav_cont > option{
   display: block;
 }
 
@@ -99,8 +127,43 @@ input[type="color"]{
   display: inline;
 }
 
-#sidenav > .unredo_block > button > span{
+.sidenav_cont > .unredo_block > button > span{
   margin: 0px;
+}
+
+.draw_size_block{
+  height: 64px;
+  width: 100%;
+}
+
+.draw_size_block > .ib40{
+  width: 39%;
+  display: inline-block;
+}
+
+.draw_size_block > .ib60{
+  width: 59%;
+  display: inline-block;
+}
+
+.draw_size_block > div > span{
+   width: 25%;
+   display: inline-block;
+ }
+
+.draw_size_block > div > input{
+  width: 35%;
+  display: inline-block;
+}
+
+.center_block{
+  position: relative;
+}
+
+.center_block > button{
+  position: absolute;
+  margin-top: -50%;
+  transform: translate(0, 50%);
 }
 
 /* View */
@@ -278,3 +341,5 @@ input[type="color"]{
     width: 31%;
   }
 }
+
+/* Too much for simple thing */

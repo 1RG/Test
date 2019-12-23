@@ -9,64 +9,82 @@
   <body>
     <div id="sidenav_back"></div>
     <div id="sidenav">
-      <span>Clear canvas</span>
-      <button id="btn_reset" >Reset</button>
-      <span>Fill in remaining part</span>
-      <button id="btn_end">End</button>
-      <span>Animation type</span>
-      <select id="draw_anim_type">
-        <option value="full">Full</option>
-        <option value="circle">Circle</option>
-        <option value="no">No</option>
-      </select>
-      <span>Animation delay</span>
-      <select id="draw_anim_delay">
-        <option value="1">1</option>
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="30">30</option>
-        <option value="60" selected>60</option>
-        <option value="90">90</option>
-        <option value="120">120</option>
-        <option value="240">240</option>
-      </select>
-      <span>Line Color</span>
-      <input id="draw_anim_color" type="color" value="#67809f">
-      <span>Line width</span>
-      <select id="draw_line_width">
-        <option value="0.05">0.05</option>
-        <option value="0.1">0.1</option>
-        <option value="0.5">0.5</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3" selected>3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="7">7</option>
-        <option value="10">10</option>
-      </select>
-      <span>Line density</span>
-      <select id="draw_line_density">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="7">7</option>
-        <option value="10" selected>10</option>
-        <option value="15">15</option>
-        <option value="20">20</option>
-        <option value="25">25</option>
-        <option value="30">30</option>
-      </select>
-      <span>Undo/redo line draw</span>
-      <div class="unredo_block">
-        <button id="btn_undo" disabled="" title="ctrl+z">Undo (<span id="btn_undo_nr">0</span>)</button><button id="btn_redo" disabled="" title="ctrl+y">Redo (<span id="btn_redo_nr">0</span>)</button>
+      <div class="sidenav_cont_title">
+        <span class="text">Menu &#9776;</span>
+        <button id="sidenav_close_btn">&#x2715;</button>
       </div>
-      <span>Download canvas draw</span>
-      <button id="btn_download">Download</button><a id="btn_download_a"></a>
-      <button id="btn_view_data">View data</button>
+      <div class="sidenav_cont">
+        <span>Clear canvas</span>
+        <button id="btn_reset" >Reset</button>
+        <span>Fill in remaining part</span>
+        <button id="btn_end">End</button>
+        <span>Animation type</span>
+        <select id="draw_anim_type">
+          <option value="full">Full</option>
+          <option value="circle">Circle</option>
+          <option value="no">No</option>
+        </select>
+        <span>Animation delay</span>
+        <select id="draw_anim_delay">
+          <option value="1">1</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30"selected>30</option>
+          <option value="60">60</option>
+          <option value="90">90</option>
+          <option value="120">120</option>
+          <option value="240">240</option>
+        </select>
+        <span>Line Color</span>
+        <input id="draw_anim_color" type="color" value="#67809f">
+        <span>Line width</span>
+        <select id="draw_line_width">
+          <option value="0.05">0.05</option>
+          <option value="0.1">0.1</option>
+          <option value="0.5">0.5</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="7">7</option>
+          <option value="10">10</option>
+        </select>
+        <span>Line density</span>
+        <select id="draw_line_density">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="7">7</option>
+          <option value="10" selected>10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+          <option value="25">25</option>
+          <option value="30">30</option>
+        </select>
+        <span>Undo/redo line draw</span>
+        <div class="unredo_block">
+          <button id="btn_undo" disabled="" title="ctrl+z">Undo (<span id="btn_undo_nr">0</span>)</button><button id="btn_redo" disabled="" title="ctrl+y">Redo (<span id="btn_redo_nr">0</span>)</button>
+        </div>
+        <span>Download canvas draw</span>
+        <button id="btn_download">Download</button><a id="btn_download_a"></a>
+        <button id="btn_view_data">View data</button>
+        <span>Canvas draw size</span>
+        <div class="draw_size_block">
+          <div class="ib60">
+            <span>width:</span>
+            <input type="number" id="draw_size_w" min="1">
+            <span>height:</span>
+            <input type="number" id="draw_size_h" min="1">
+          </div>
+          <div class="ib40 center_block">
+            <button id="btn_set_draw_size" class="b33 center_block_p">Set</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div id="tool">
       <button id="tool_menu_btn" title="Menu">Menu &#9776;</button>
